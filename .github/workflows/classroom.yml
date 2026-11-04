@@ -1,0 +1,35 @@
+name: GitHub Classroom Workflow
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+jobs:
+  build:
+    name: Autograding
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: docker/setup-buildx-action@v2
+
+      # TODO build and run unit tests
+
+      - name: Build images
+        timeout-minutes: 10
+        run: docker compose build --push
+
+      # TODO deploy to k8s with liveness and readyness probes
+
+      - name: Wait before services are ready
+        run: kubectl wait -n test -l app.kubernetes.io/name=gateway pod --for=condition=Ready --timeout 3m
+      
+      # TODO setup parameters in classroom/autograding.json
+      
+      - name: Autograding
+        uses: education/autograding@v1
+        continue-on-error: true
