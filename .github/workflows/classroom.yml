@@ -17,19 +17,49 @@ jobs:
 
       - uses: docker/setup-buildx-action@v2
 
-      # TODO build and run unit tests
+      - name: Run unit tests
+        run: |
+          for svc in gateway-service flight-service ticket-service bonus-service; do
+            echo "=== $svc ==="
+            (cd "$svc" && npm ci && npm test)
+          done
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build images
         timeout-minutes: 10
         run: docker compose build --push
 
-      # TODO deploy to k8s with liveness and readyness probes
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v4
+
+      - name: Set up helm
+        uses: azure/setup-helm@v4
+
+      - name: Configure kubeconfig
+        run: |
+          mkdir -p "$HOME/.kube"
+          echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > "$HOME/.kube/config"
+
+      - name: Deploy Postgres
+        run: kubectl apply -f k8s/postgres/
+
+      - name: Deploy services
+        run: |
+          for svc in flight-service ticket-service bonus-service gateway-service; do
+            helm upgrade --install "$svc" ./helm/service-chart -f "helm/values/$svc.yaml"
+          done
 
       - name: Wait before services are ready
-        run: kubectl wait -n test -l app.kubernetes.io/name=gateway pod --for=condition=Ready --timeout 3m
-      
-      # TODO setup parameters in classroom/autograding.json
-      
+        run: kubectl wait -l app=gateway-service pod --for=condition=Ready --timeout 3m
+
+      - name: Install Newman
+        run: npm install -g newman
+
       - name: Autograding
         uses: education/autograding@v1
         continue-on-error: true

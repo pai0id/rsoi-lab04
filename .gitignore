@@ -1,4 +1,10 @@
 # Created by .ignore support plugin (hsz.mobi)
+# Talos/k8s cluster secrets (private keys, client certs) - never commit
+infra/talos/talosconfig
+infra/talos/kubeconfig
+infra/talos/controlplane.yaml
+infra/talos/worker.yaml
+
 ### Node template
 # Logs
 logs

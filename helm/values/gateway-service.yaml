@@ -1,0 +1,22 @@
+image:
+  repository: pai0id/gateway-service
+  tag: latest
+
+service:
+  port: 8080
+
+env:
+  - name: PORT
+    value: "8080"
+  - name: FLIGHT_SERVICE_URL
+    value: http://flight-service:8060
+  - name: TICKET_SERVICE_URL
+    value: http://ticket-service:8070
+  - name: BONUS_SERVICE_URL
+    value: http://bonus-service:8050
+
+ingress:
+  enabled: true
+  className: nginx
+  path: /
+  pathType: Prefix

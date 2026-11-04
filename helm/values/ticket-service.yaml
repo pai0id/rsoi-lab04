@@ -1,0 +1,20 @@
+image:
+  repository: pai0id/ticket-service
+  tag: latest
+
+service:
+  port: 8070
+
+env:
+  - name: PORT
+    value: "8070"
+  - name: POSTGRES_HOST
+    value: postgres
+  - name: POSTGRES_PORT
+    value: "5432"
+  - name: POSTGRES_USER
+    value: program
+  - name: POSTGRES_PASSWORD
+    value: test
+  - name: POSTGRES_DB
+    value: tickets

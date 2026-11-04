@@ -38,7 +38,13 @@ step() {
 
   printf "=== Step %d: scale %s to %s ===\n" "$step" "$deployment" "$replicas"
 
-  kubectl scale deployment "$deployment" -n "$namespace" --replicas "$replicas" 
+  kubectl scale deployment "$deployment" -n "$namespace" --replicas "$replicas"
+
+  if [[ "$replicas" -eq 0 ]]; then
+    kubectl wait --for=delete pod -l app="$deployment" -n "$namespace" --timeout=60s || true
+  else
+    kubectl wait --for=condition=Ready pod -l app="$deployment" -n "$namespace" --timeout=60s
+  fi
 
   newman run \
     --delay-request=100 \

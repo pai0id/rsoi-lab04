@@ -1,0 +1,21 @@
+replicaCount: 1
+
+image:
+  repository: ""
+  tag: latest
+  pullPolicy: Always
+
+service:
+  port: 8080
+
+env: []
+
+healthPath: /manage/health
+
+resources: {}
+
+ingress:
+  enabled: false
+  className: nginx
+  path: /
+  pathType: Prefix

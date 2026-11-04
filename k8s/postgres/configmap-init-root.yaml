@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-init-root
+data:
+  10-create-user.sql: |
+    -- file: 10-create-user.sql
+    CREATE ROLE program WITH PASSWORD 'test';
+    ALTER ROLE program WITH LOGIN;
+  20-create-databases.sh: |
+    #!/usr/bin/env bash
+    set -e
+
+    export VARIANT="v1"
+    export SCRIPT_PATH=/docker-entrypoint-initdb.d/
+    export PGPASSWORD=postgres
+    psql -f "$SCRIPT_PATH/scripts/db-$VARIANT.sql"

@@ -1,0 +1,6 @@
+apiVersion: v2
+name: service-chart
+description: Universal chart for RSOI lab04 microservices (gateway/flight/ticket/bonus)
+type: application
+version: 0.1.0
+appVersion: "1.0"
