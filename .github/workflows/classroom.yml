@@ -35,7 +35,8 @@ jobs:
         timeout-minutes: 10
         run: |
           for svc in gateway-service flight-service ticket-service bonus-service; do
-            docker build -t "pai0id/$svc:latest" "./$svc"
+            docker build -t "pai0id/$svc:${{ github.sha }}" -t "pai0id/$svc:latest" "./$svc"
+            docker push "pai0id/$svc:${{ github.sha }}"
             docker push "pai0id/$svc:latest"
           done
 
@@ -56,8 +57,7 @@ jobs:
       - name: Deploy services
         run: |
           for svc in flight-service ticket-service bonus-service gateway-service; do
-            helm upgrade --install "$svc" ./helm/service-chart -f "helm/values/$svc.yaml"
-            kubectl rollout restart deployment "$svc"
+            helm upgrade --install "$svc" ./helm/service-chart -f "helm/values/$svc.yaml" --set image.tag="${{ github.sha }}"
             kubectl rollout status deployment "$svc" --timeout=120s
           done
 
